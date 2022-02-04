@@ -1,45 +1,53 @@
-from arcana.data.stores.bids import BidsApp
-from arcana.data.dimensions.clinical import Clinical
-from arcana.data.types.general import directory
-from arcana.data.types.neuroimaging import niftix_gz
+from pathlib import Path
+from pydra import mark
+from arcana.data.types.general import text
 
 
-VERSION = '0.16.1'
-AIS_VERSION = '0.1.5'
+@mark.task
+def concatenate(in_file1: Path, in_file2: Path, out_file: Path=None,
+                duplicates: int=1) -> Path:
+    """Concatenates the contents of two files and writes them to a third
 
-BIDS_INPUTS = [('T1w', niftix_gz, 'anat/T1w'),
-               ('T2w', niftix_gz, 'anat/T2w'),
-               ('fMRI', niftix_gz, 'func/bold')]
-BIDS_OUTPUTS = [('mriqc', directory, None)]
-BIDS_PARAMETERS = []
+    Parameters
+    ----------
+    in_file1 : Path
+        A text file
+    in_file2 : Path
+        Another text file
+    out_file : Path
+       The path to write the output file to 
 
-docker_image = f"poldracklab/mriqc:{VERSION}"
-
-
-task = BidsApp(
-    app_name='mriqc',
-    image=docker_image,
-    executable='mriqc',  # Extracted using `docker_image_executable(docker_image)`
-    inputs=BIDS_INPUTS,
-    outputs=BIDS_OUTPUTS)
+    Returns
+    -------
+    Path
+        A text file made by concatenating the two inputs
+    """
+    if out_file is None:
+        out_file = Path('out_file.txt').absolute()
+    contents = []
+    for _ in range(duplicates):
+        for fname in (in_file1, in_file2):
+            with open(fname) as f:
+                contents.append(f.read())
+    with open(out_file, 'w') as f:
+        f.write('\n'.join(contents))
+    return out_file
 
 
 spec = {
-    'package_name': "mriqc",
+    'package_name': "demo",
     'description': (
-        "MRIQC extracts no-reference IQMs (image quality metrics) from "
-        "structural (T1w and T2w) and functional MRI (magnetic resonance "
-        "imaging) data."),
+        "A demonstraction package to be used as a template for defining new "
+        "wrapper specificiations"),
     'commands': [
-        {'pydra_task': 'task',  # Name of Pydra task preceded by module path, e.g. pydra.tasks.fsl.preprocess.fast:FAST. Module path can be omitted if defined in current module
-         'inputs': [i[:2] for i in BIDS_INPUTS],
-         'outputs': [o[:2] for o in BIDS_OUTPUTS],
-         'parameters': [p[0] for p in BIDS_PARAMETERS]}],
-    'version': AIS_VERSION,
-    'app_version': VERSION,
-    'packages': [],  # [('dcm2niix', '1.0.20201102')],
+        {'pydra_task': __name__ + ':task',  # Path to the pydra task interface
+         'inputs': [('in_file1', text), ('in_file2', text)],
+         'outputs': [('out', text)],
+         'parameters': ['duplicates']}],
+    'version': 1,
+    'pkg_version': 1.0,
+    'packages': [],
     'python_packages': [],
-    'base_image': docker_image,
+    'base_image': 'debian:buster-slim',
     'maintainer': 'thomas.close@sydney.edu.au',
-    'info_url': 'http://mriqc.readthedocs.io',
-    'frequency': Clinical.session}
+    'info_url': 'http://concatenate-docs.at.some.url'}
