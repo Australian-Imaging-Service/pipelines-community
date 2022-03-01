@@ -1,6 +1,6 @@
 from pathlib import Path
 from pydra import mark
-from arcana.data.types.general import text
+from arcana.data.formats.common import text
 
 
 @mark.task
