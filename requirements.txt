@@ -1,0 +1,8 @@
+arcana >=0.10.8
+arcana-xnat >= 0.3.3
+fileformats-extras
+fileformats-datascience
+fileformats-datascience-extras
+fileformats-medimage
+fileformats-medimage-extras
+
