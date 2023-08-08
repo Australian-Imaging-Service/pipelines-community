@@ -1,0 +1,32 @@
+arcana_spec_version: 1.0
+title: 'Zip up a directory'
+version:
+  package: "1.0"
+base_image:
+  name: ubuntu
+authors:
+  - name: Thomas G. Close
+    email: thomas.close@sydney.edu.au
+command:
+  task: arcana.common:shell_cmd
+  row_frequency: session
+  inputs:
+    in_dir:
+      datatype: generic/directory
+      help: "Input directory"
+      configuration:
+        path: anat/T1w
+  outputs:
+    gzipped:
+      datatype: generic/directory+zip
+      help: Zipped directory
+      configuration:
+  parameters:
+    flags:
+      field: flags
+      datatype: field/text
+      help: Command line flags passed on directly to zip
+  configuration:
+    name: zip
+    executable: zip
+    
