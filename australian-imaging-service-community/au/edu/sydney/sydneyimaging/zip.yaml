@@ -11,6 +11,9 @@ docs:
   info_url: https://manpages.ubuntu.com/manpages/focal/man1/zip.1.html
   description: |
     This is a simple pipeline that simply zips up a given directory
+packages:
+  system:
+  - vim
 command:
   task: arcana.common:shell_cmd
   row_frequency: session
