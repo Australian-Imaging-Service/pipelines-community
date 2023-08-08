@@ -10,9 +10,12 @@ runner = CliRunner()
 results = runner.invoke(
     make_app,
     [
-        f"{PKG_PATH}/australian-imaging-service-community/au/edu/sydney/sydneyimaging/zip.yaml",
+        f"{PKG_PATH}/australian-imaging-service-community/",
         "xnat:XnatApp",
-        "--raise-errors"
+        "--raise-errors",
+        "--clean-up",
+        "--loglevel",
+        "info",
     ],
     catch_exceptions=False,
 )

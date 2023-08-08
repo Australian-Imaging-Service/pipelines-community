@@ -55,4 +55,4 @@ jobs:
       run: >
         arcana deploy make-app ./australian-imaging-service-community xnat:XnatApp 
         --registry ghcr.io --check-registry --release pipelines-community-metapackage $RELEASE
-        --clean-up --tag-latest $PUSH
+        --clean-up --tag-latest --loglevel info $PUSH
