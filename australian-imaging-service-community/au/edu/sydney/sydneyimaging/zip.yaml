@@ -7,6 +7,10 @@ base_image:
 authors:
   - name: Thomas G. Close
     email: thomas.close@sydney.edu.au
+docs:
+  info_url: https://manpages.ubuntu.com/manpages/focal/man1/zip.1.html
+  description: |
+    This is a simple pipeline that simply zips up a given directory
 command:
   task: arcana.common:shell_cmd
   row_frequency: session
@@ -15,7 +19,7 @@ command:
       datatype: generic/directory
       help: "Input directory"
       configuration:
-        path: anat/T1w
+        
   outputs:
     gzipped:
       datatype: generic/directory+zip
