@@ -27,7 +27,7 @@ command:
         argstr: ''
         position: -1
   outputs:
-    gzipped:
+    zipped:
       datatype: application/zip
       help: Zipped directory
       configuration:
