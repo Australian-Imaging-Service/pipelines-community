@@ -18,22 +18,27 @@ command:
   task: arcana.common:shell_cmd
   row_frequency: session
   inputs:
-    in_dir:
+    to_zip:
       datatype: generic/directory
-      help: "Input directory"
+      help: "Input directory to zip"
       configuration:
-        
+        argstr: ''
+        position: -1
   outputs:
     gzipped:
       datatype: generic/directory+zip
       help: Zipped directory
       configuration:
+        argstr: ''
+        position: -2
   parameters:
     flags:
       field: flags
       datatype: field/text
       help: Command line flags passed on directly to zip
+      configuration:
+        argstr: -{compression}
   configuration:
-    name: zip
+    name: zip_dir
     executable: zip
     
