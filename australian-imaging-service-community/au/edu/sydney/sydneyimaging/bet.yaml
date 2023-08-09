@@ -37,8 +37,7 @@ command:
       configuration:
         position: -1
         argstr: ''
-  parameters:
-
+  parameters: {}
   configuration:
     name: bet
     executable: bet
