@@ -13,7 +13,9 @@ docs:
     This is a simple pipeline that simply zips up a given directory
 packages:
   system:
+  - zip
   - vim
+  - nano
 command:
   task: arcana.common:shell_cmd
   row_frequency: session
@@ -26,18 +28,18 @@ command:
         position: -1
   outputs:
     gzipped:
-      datatype: generic/directory+zip
+      datatype: application/zip
       help: Zipped directory
       configuration:
         argstr: ''
         position: -2
   parameters:
-    flags:
-      field: flags
-      datatype: field/text
-      help: Command line flags passed on directly to zip
+    compression:
+      datatype: int
+      help: the level of compression applied
+      default: 5
       configuration:
-        argstr: -{compression}
+          argstr: -{compression}
   configuration:
     name: zip_dir
     executable: zip

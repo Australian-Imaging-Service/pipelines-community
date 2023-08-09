@@ -1,11 +1,12 @@
 title: 'Example BET pipeline'
 arcana_spec_version: 1.0
 version:
-  package: "6.0.2"
+  package: "6.0.6.4"
   build: "1"
 base_image:
-  name: vnmd/fsl_6.0.2
+  name: vnmd/fsl_6.0.6.4
   package_manager: apt
+  tag: '20230618'
 # packages:
 #   pip:
 #     - fileformats-medimage-extras
