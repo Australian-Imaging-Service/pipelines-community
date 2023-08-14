@@ -16,11 +16,17 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
+    - name: Removed unnecessary tools to free space
+      run: |
+        sudo rm -rf /usr/share/dotnet
+        sudo rm -rf "$AGENT_TOOLSDIRECTORY"
     - name: Checkout
       uses: actions/checkout@v2
 
     - name: Get release tag
-      run: echo "RELEASE=`echo $(git describe --tags --abbrev=0)`" >> $GITHUB_ENV
+      run: |
+        git fetch --prune --unshallow
+        echo "RELEASE=`echo $(git describe --tags --abbrev=0)`" >> $GITHUB_ENV
 
     - name: Unset header
       # checkout@v2 adds a header that makes branch protection report errors
@@ -54,5 +60,5 @@ jobs:
         PUSH: "${{ steps.deployable.outputs.PUSH }}"
       run: >
         arcana deploy make-app ./australian-imaging-service-community xnat:XnatApp 
-        --registry ghcr.io --check-registry --release pipelines-community-metapackage $RELEASE
-        --clean-up --tag-latest --loglevel info $PUSH
+        --registry ghcr.io --check-registry --clean-up --tag-latest --loglevel info 
+        --release pipelines-community-metapackage $RELEASE $PUSH
