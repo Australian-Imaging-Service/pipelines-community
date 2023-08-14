@@ -27,7 +27,7 @@ command:
   row_frequency: session  # the pipeline is desgined to run on imaging "sessions" as opposed to "subjects" or "projects"
   inputs:  # List the inputs that are presented to end-user in UI
     to_zip:
-      datatype: generic/fsobject  # MIME-type or "MIME-like" format
+      datatype: generic/fs-object  # MIME-type or "MIME-like" format
       help: "Input file-system object to zip"  # description of field presented in UI
       configuration:  # Additional configuration args that are passed to the arcana.common:shell_cmd task as part of the "inputs" dict
         argstr: ''  # Position of field when printed to command line call. Negative numbers are indexed from the end backwards
