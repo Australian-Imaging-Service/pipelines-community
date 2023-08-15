@@ -2,9 +2,10 @@ name: generate docs
 
 on:
   push:
-    branches:
-      - main
-  repository_dispatch:  # Allow access tokens which have write access to this repo to trigger this action
+    branches: [ main, develop ]
+    tags: [ '*' ]
+  pull_request:
+    branches: [ main, develop ]
   workflow_dispatch:  # Allow manual triggering by a user with write access to this repo
 
 jobs:
@@ -44,7 +45,7 @@ jobs:
 
       - name: Deploy docs
         uses: peaceiris/actions-gh-pages@v3
-        if: github.ref == 'refs/heads/main'
+        if: github.event_name == 'push' && startsWith(github.ref, 'refs/tags/v')
         with:
           github_token: ${{ secrets.GITHUB_TOKEN }}
           publish_dir: .
@@ -56,6 +57,7 @@ jobs:
       # only when real docs changes occur would require using a PAT.
       - name: Trigger rebuild of docs
         uses: peter-evans/repository-dispatch@v1
+        if: github.event_name == 'push' && startsWith(github.ref, 'refs/tags/v')
         with:
           token: ${{ secrets.GITHUBPAGES_KEY }}
           repository: Australian-Imaging-Service/Australian-Imaging-Service.github.io
