@@ -14,6 +14,7 @@ results = runner.invoke(
         "xnat:XnatApp",
         "--raise-errors",
         "--clean-up",
+        "--push",
         "--loglevel",
         "info",
     ],
