@@ -4,7 +4,7 @@ import tempfile
 import operator as op
 import functools
 from fileformats.generic import Directory
-from fileformats.archive import Zip
+from fileformats.application import Zip
 from arcana.common import DirTree
 from arcana.testing import TestDataSpace
 from arcana.testing.data.blueprint import (
