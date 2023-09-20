@@ -24,7 +24,7 @@ test.log
 /docker-tests
 ~*
 /docs/source/_static/images/logo-square.png
-/arcana/core/_version.py
+/src/australianimagingservice_community/_version.py
 *.venv
 .mypy_cache
 .build*
