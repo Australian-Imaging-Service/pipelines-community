@@ -11,8 +11,8 @@ dependencies = [
     "fileformats",
     "fileformats-medimage",
     "pydra >=0.23a0",
-    "pydra-mrtrix3",
-    "pydra-fastsurfer",
+    # "pydra-mrtrix3",
+    # "pydra-fastsurfer",
 ]
 license = {file = "LICENSE"}
 authors = [
@@ -62,16 +62,17 @@ repository = "https://github.com/Australian-Imaging-Service/pipelines-community"
 
 [tool.hatch.version]
 source = "vcs"
+raw-options = {root = ".."}
 
 [tool.hatch.build.hooks.vcs]
-version-file = "src/australianimagingservice_community/_version.py"
+version-file = "australianimagingservice_community/_version.py"
 
 [tool.hatch.build.targets.wheel]
-packages = ["src/australianimagingservice_community"]
+packages = ["australianimagingservice_community"]
 
 [tool.black]
 target-version = ['py38']
-exclude = "src/australianimagingservice_community/_version.py"
+exclude = "australianimagingservice_community/_version.py"
 
 [tool.codespell]
 ignore-words = ".codespell-ignorewords"
