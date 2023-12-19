@@ -67,11 +67,11 @@ source = "vcs"
 version-file = "src/australianimagingservice_community/_version.py"
 
 [tool.hatch.build.targets.wheel]
-packages = ["australianimagingservice_community"]
+packages = ["src/australianimagingservice_community"]
 
 [tool.black]
 target-version = ['py38']
-exclude = "australianimagingservice_community/_version.py"
+exclude = "src/australianimagingservice_community/_version.py"
 
 [tool.codespell]
 ignore-words = ".codespell-ignorewords"
