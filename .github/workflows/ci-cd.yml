@@ -87,11 +87,6 @@ jobs:
       run: >
         pytest -vvs --cov australianimagingservice.community.${{ matrix.subpackage }}
         --cov-config .coveragerc --cov-report xml ./src/${{ matrix.subpackage }}
-    - name: Upload coverage to Codecov
-      uses: codecov/codecov-action@v2
-      with:
-        fail_ci_if_error: true
-        token: ${{ secrets.CODECOV_TOKEN }}
     - name: Install build tools
       run: python3 -m pip install build twine
     - name: Build source and wheel distributions
@@ -175,7 +170,9 @@ jobs:
           OPTIONS=--push
         else
           OPTIONS=--use-local-packages
-          pip install -e ./src
+          for pkg in ./src/*; do 
+            pip install -e ./src/$pkg
+          done
         fi
         arcana deploy make-app specs/australian-imaging-service-community xnat:XnatApp \
         --registry ghcr.io --check-registry --clean-up --tag-latest --loglevel info \
