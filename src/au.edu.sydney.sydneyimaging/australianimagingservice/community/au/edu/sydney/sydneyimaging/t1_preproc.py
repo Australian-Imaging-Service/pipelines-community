@@ -7,7 +7,7 @@ from pydra.engine.specs import File
 #     labelsgmfix,
 # )
 from fileformats.medimage import NiftiGz, MghGz
-from fileformats.medimage_mrtrix3 import ImageFormat as MIF
+# from fileformats.medimage_mrtrix3 import ImageFormat as MIF
 # from pydra.tasks.fastsurfer.latest import fastsurfer
 
 
