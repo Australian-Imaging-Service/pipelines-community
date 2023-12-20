@@ -1,0 +1,215 @@
+# This workflows will upload a Python Package using Twine when a release is created
+# For more information see: https://help.github.com/en/actions/language-and-framework-guides/using-python-with-github-actions#publishing-to-package-registries
+
+name: CI/CD
+
+on:
+  push:
+    branches: [ main, develop ]
+    tags: [ '*' ]
+  pull_request:
+    branches: [ main, develop ]
+  release:
+    types: [published]
+  workflow_dispatch:  # Allow manual triggering by a user with write access to this repo
+
+defaults:
+  run:
+    shell: bash
+
+env:
+  PYPI_URL: https://pypi.org/simple
+  
+jobs:
+
+  build-docs:
+    runs-on: ubuntu-20.04
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v2
+        with:
+          submodules: recursive  # Fetch Hugo themes (true OR recursive)
+          fetch-depth: 1    # Fetch all history for .GitInfo and .Lastmod
+      # TODO: Need a unique key we can pass, but as we're targeting
+      # arcana@master, this is not trivial.
+      #
+      # - name: Cache dependencies
+      #   uses: actions/cache@v1
+      #   with:
+      #     path: ~/.local/lib
+      #     key: ${{ runner.os }}-python-${{ hashFiles('**/package-lock.json') }}
+      #     restore-keys: |
+      #       ${{ runner.os }}-python-
+      - name: Setup Python
+        uses: actions/setup-python@v2
+        with:
+          python-version: '3.11' # Version range or exact version of a Python version to use, using SemVer'
+      - name: Install python dependencies
+        run: pip install -r ./requirements.txt
+      - name: Generate pipeline docs
+        run: arcana deploy make-docs specs/australian-imaging-service-community docs/pipelines --flatten --default-data-space arcana.common:Clinical
+      - uses: actions/upload-artifact@v3
+        with:
+          name: built-docs
+          path: docs/build/html
+
+  python:
+    needs: ["build-docs"]
+    strategy:
+      matrix:
+        subpackage:
+        - au.edu.sydney.sydneyimaging
+      fail-fast: false
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        shell: bash -l {0}
+    steps:
+    - name: Checkout
+      uses: actions/checkout@v2
+    - name: Unset header
+      # checkout@v2 adds a header that makes branch protection report errors
+      # because the Github action bot is not a collaborator on the repo
+      run: git config --local --unset http.https://github.com/.extraheader
+    - name: Fetch tags
+      run: git fetch --prune --unshallow
+    - name: Disable etelemetry
+      run:  echo "NO_ET=TRUE" >> $GITHUB_ENV
+    - name: Set up Python
+      uses: actions/setup-python@v2
+      with:
+        python-version: "3.12"
+    - name: Update build tools
+      run: python3 -m pip install --upgrade pip
+    - name: Install Package
+      run: python3 -m pip install -e ./src/${{ matrix.subpackage }}[test]
+    - name: Pytest
+      run: >
+        pytest -vvs --cov australianimagingservice.community.${{ matrix.subpackage }}
+        --cov-config .coveragerc --cov-report xml ./src/${{ matrix.subpackage }}
+    - name: Install build tools
+      run: python3 -m pip install build twine
+    - name: Build source and wheel distributions
+      run: python3 -m build ./src/${{ matrix.subpackage }}
+    - name: Check distributions
+      run: twine check ./src/${{ matrix.subpackage }}/dist/*
+    - name: Extract package name and versions
+      run: |
+        PKG=$(ls ./src/${{ matrix.subpackage }}/dist | grep -e '.tar.gz')
+        PKG=${PKG%.tar.gz}
+        echo "PKG_NAME=${PKG%%-*}" >> $GITHUB_ENV
+        echo "PKG_VERSION=${PKG##*-}" >> $GITHUB_ENV
+        echo "PYPI_VERSION=$(curl -s "${PYPI_URL}/${PKG_NAME}/" | grep -oP "${PKG_NAME}-\K[0-9]+\.[0-9]+\.[0-9]+(?=\.tar\.gz)" | sort -V | tail -n 1)" >> $GITHUB_ENV
+    - name: Check for PyPI token on tag
+      id: deployable
+      if: github.event_name == 'release'
+      env:
+        PYPI_API_TOKEN: "${{ secrets.PYPI_API_TOKEN }}"
+      run: if [ -n "$PYPI_API_TOKEN" ] && [ "$PKG_VERSION" != "$PYPI_VERSION" ]; then echo "DEPLOY=true" >> $GITHUB_OUTPUT; fi
+    - name: Upload to PyPI
+      if: steps.deployable.outputs.DEPLOY
+      uses: pypa/gh-action-pypi-publish@release/v1
+      with:
+        user: __token__
+        password: ${{ secrets.PYPI_API_TOKEN }}
+    - name: Wait for package to mirror
+      if: steps.deployable.outputs.DEPLOY
+      run: |
+        MAX_ATTEMPTS=60  # Adjust the maximum number of attempts as needed
+        SLEEP_INTERVAL=5  # Adjust the sleep interval (in seconds) as needed
+        for ((attempt = 1; attempt <= MAX_ATTEMPTS; attempt++)); do
+          LATEST_VERSION=$(curl -s "${PYPI_URL}/${PKG_NAME}/" | grep -oP "${PKG_NAME}-\K[0-9]+\.[0-9]+\.[0-9]+(?=\.tar\.gz)" | sort -V | tail -n 1)
+          if [ "$PKG_VERSION" == "$LATEST_VERSION" ]; then
+            echo "Updated package version ${PKG_VERSION} is now available on PyPI. Exiting..."
+            exit 0
+          else
+            echo "Package version ${PKG_VERSION} not yet available on PyPI (latest found = $LATEST_VERSION). Waiting..."
+            sleep $SLEEP_INTERVAL
+          fi
+        done
+        echo "Timeout reached. Exiting..."
+        exit 1
+            
+  pipelines:
+    needs: [python]
+    runs-on: ubuntu-latest
+    steps:
+    - name: Remove unnecessary tools to free space
+      run: |
+        sudo rm -rf /usr/share/dotnet
+        sudo rm -rf "$AGENT_TOOLSDIRECTORY"
+    - name: Checkout
+      uses: actions/checkout@v2
+    - name: Get release tag
+      run: |
+        git fetch --prune --unshallow
+        echo "VERSION=`echo $(git describe --tags --abbrev=0)`" >> $GITHUB_ENV
+    - name: Unset header
+      # checkout@v2 adds a header that makes branch protection report errors
+      # because the Github action bot is not a collaborator on the repo
+      run: git config --local --unset http.https://github.com/.extraheader
+    - name: Set up Python
+      uses: actions/setup-python@v2
+      with:
+        python-version: '3.11'
+    - name: Update build tools
+      run: python -m pip install --upgrade pip
+    - name: Install dependencies
+      run: pip install -r requirements.txt
+    - uses: docker/login-action@v2
+      with:
+        registry: ghcr.io
+        username: ${{ github.actor }}
+        password: ${{ secrets.GITHUB_TOKEN }} # - must be in GitHub Secrets!
+    - name: Check for tagged release
+      if: github.event_name == 'release'
+      run: echo "RELEASE=1" >> $GITHUB_ENV
+    - name: Build and push container images
+      run: |
+        if [ -z "$RELEASE" ]; then
+          OPTIONS=--push
+        else
+          OPTIONS=--use-local-packages
+          for pkg in ./src/*; do 
+            pip install -e ./src/$pkg
+          done
+        fi
+        arcana deploy make-app specs/australian-imaging-service-community xnat:XnatApp \
+        --registry ghcr.io --check-registry --clean-up --tag-latest --loglevel info \
+        --release pipelines-community-metapackage $VERSION $OPTIONS
+
+  deploy-docs:
+    needs: [build-docs, pipelines]
+    runs-on: ubuntu-latest
+    steps:
+    - name: Download built docs
+      uses: actions/download-artifact@v3
+      with:
+        name: built-docs
+        path: docs/build/html
+    - name: Remove /docs/pipelines/ from .gitignore
+      run: sed -i 's%^/docs/pipelines/\*$%%' .gitignore            
+    - name: Check for GHPAGES_DEPLOY_KEY token on tag
+      id: deployable
+      if: github.event_name == 'release'
+      env:
+        GHPAGES_DEPLOY_KEY: "${{ secrets.GHPAGES_DEPLOY_KEY }}"
+      run: if [ -n "$GHPAGES_DEPLOY_KEY" ]; then echo "DEPLOY=true" >> $GITHUB_OUTPUT; fi
+    - name: Deploy docs
+      uses: peaceiris/actions-gh-pages@v3
+      if: steps.deployable.outputs.DEPLOY
+      with:
+        github_token: ${{ secrets.GITHUB_TOKEN }}
+        publish_dir: .
+        publish_branch: docs
+        enable_jekyll: true  # This branch isn't actually fed to GH pages
+    # It's possible, likely even, that we'll trigger unnecessary docs
+    # rebuilds with this. Running this properly as a separate workflow
+    # only when real docs changes occur would require using a PAT.
+    - name: Trigger rebuild of docs
+      uses: peter-evans/repository-dispatch@v1
+      if: steps.deployable.outputs.DEPLOY
+      with:
+        token: ${{ secrets.GITHUBPAGES_KEY }}
+        repository: Australian-Imaging-Service/Australian-Imaging-Service.github.io
+        event-type: Rebuild docs
