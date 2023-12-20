@@ -5,6 +5,7 @@ build-backend = "hatchling.build"
 [project]
 name = "australianimagingservice-community-au-edu-sydney-sydneyimaging"
 description = "Community-developed pipelines at Sydney Imaging CRF @ The University of Sydney to be run on the Australian Imaging Service"
+readme="README.md"
 requires-python = ">=3.8"
 dependencies = [
     "fileformats",
