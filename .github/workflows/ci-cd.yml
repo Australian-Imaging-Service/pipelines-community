@@ -16,71 +16,11 @@ on:
 defaults:
   run:
     shell: bash
+
+env:
+  PYPI_URL: https://pypi.org/simple
   
 jobs:
-  test-python:
-    strategy:
-      matrix:
-        os: [macos-latest, ubuntu-latest, windows-latest]
-        python-version: ["3.8", "3.12"]
-      fail-fast: false
-    runs-on: ${{ matrix.os }}
-    defaults:
-      run:
-        shell: bash -l {0}
-    steps:
-    - name: Checkout
-      uses: actions/checkout@v2
-    - name: Unset header
-      # checkout@v2 adds a header that makes branch protection report errors
-      # because the Github action bot is not a collaborator on the repo
-      run: git config --local --unset http.https://github.com/.extraheader
-    - name: Fetch tags
-      run: git fetch --prune --unshallow
-    - name: Disable etelemetry
-      run:  echo "NO_ET=TRUE" >> $GITHUB_ENV
-    - name: Set up Python ${{ matrix.python-version }} on ${{ matrix.os }}
-      uses: actions/setup-python@v2
-      with:
-        python-version: ${{ matrix.python-version }}
-    - name: Update build tools
-      run: python3 -m pip install --upgrade pip
-    - name: Install Package
-      run: python3 -m pip install -e ./src[test]
-    - name: Pytest
-      run: pytest -vvs --cov australianimagingservice_community --cov-config .coveragerc --cov-report xml .
-    - name: Upload coverage to Codecov
-      uses: codecov/codecov-action@v2
-      with:
-        fail_ci_if_error: true
-        token: ${{ secrets.CODECOV_TOKEN }}
-
-  build-python:
-    needs: [test-python]
-    runs-on: ubuntu-latest
-    steps:
-    - uses: actions/checkout@v3
-      with:
-        submodules: recursive
-        fetch-depth: 0
-    - name: Unset header
-      # checkout@v2 adds a header that makes branch protection report errors
-      # because the Github action bot is not a collaborator on the repo
-      run: git config --local --unset http.https://github.com/.extraheader
-    - name: Set up Python
-      uses: actions/setup-python@v4
-      with:
-        python-version: '3.12'
-    - name: Install build tools
-      run: python3 -m pip install build twine
-    - name: Build source and wheel distributions
-      run: python3 -m build ./src
-    - name: Check distributions
-      run: twine check ./dist/*
-    - uses: actions/upload-artifact@v3
-      with:
-        name: built-python
-        path: ./dist
 
   build-docs:
     runs-on: ubuntu-20.04
@@ -113,30 +53,90 @@ jobs:
           name: built-docs
           path: docs/build/html
 
-  deploy-python:
-    needs: [build-python, build-docs]
+  python:
+    needs: ["build-docs"]
+    strategy:
+      matrix:
+        subpackage:
+        - au.edu.sydney.sydneyimaging
+      fail-fast: false
     runs-on: ubuntu-latest
+    defaults:
+      run:
+        shell: bash -l {0}
     steps:
-    - name: Download build
-      uses: actions/download-artifact@v3
+    - name: Checkout
+      uses: actions/checkout@v2
+    - name: Unset header
+      # checkout@v2 adds a header that makes branch protection report errors
+      # because the Github action bot is not a collaborator on the repo
+      run: git config --local --unset http.https://github.com/.extraheader
+    - name: Fetch tags
+      run: git fetch --prune --unshallow
+    - name: Disable etelemetry
+      run:  echo "NO_ET=TRUE" >> $GITHUB_ENV
+    - name: Set up Python
+      uses: actions/setup-python@v2
       with:
-        name: built-main
-        path: dist
+        python-version: "3.12"
+    - name: Update build tools
+      run: python3 -m pip install --upgrade pip
+    - name: Install Package
+      run: python3 -m pip install -e ./src/${{ matrix.subpackage }}[test]
+    - name: Pytest
+      run: >
+        pytest -vvs --cov australianimagingservice.community.${{ matrix.subpackage }}
+        --cov-config .coveragerc --cov-report xml ./src/${{ matrix.subpackage }}
+    - name: Upload coverage to Codecov
+      uses: codecov/codecov-action@v2
+      with:
+        fail_ci_if_error: true
+        token: ${{ secrets.CODECOV_TOKEN }}
+    - name: Install build tools
+      run: python3 -m pip install build twine
+    - name: Build source and wheel distributions
+      run: python3 -m build ./src/${{ matrix.subpackage }}
+    - name: Check distributions
+      run: twine check ./src/${{ matrix.subpackage }}/dist/*
+    - name: Extract package name and versions
+      run: |
+        PKG=$(ls ./src/${{ matrix.subpackage }}/dist | grep -e '.tar.gz')
+        PKG=${PKG%.tar.gz}
+        echo "PKG_NAME=${PKG%%-*}" >> $GITHUB_ENV
+        echo "PKG_VERSION=${PKG##*-}" >> $GITHUB_ENV
+        echo "PYPI_VERSION=$(curl -s "${PYPI_URL}/${PKG_NAME}/" | grep -oP "${PKG_NAME}-\K[0-9]+\.[0-9]+\.[0-9]+(?=\.tar\.gz)" | sort -V | tail -n 1)" >> $GITHUB_ENV
     - name: Check for PyPI token on tag
       id: deployable
       if: github.event_name == 'release'
       env:
         PYPI_API_TOKEN: "${{ secrets.PYPI_API_TOKEN }}"
-      run: if [ -n "$PYPI_API_TOKEN" ]; then echo "DEPLOY=true" >> $GITHUB_OUTPUT; fi
+      run: if [ -n "$PYPI_API_TOKEN" ] && [ "$PKG_VERSION" != "$PYPI_VERSION" ]; then echo "DEPLOY=true" >> $GITHUB_OUTPUT; fi
     - name: Upload to PyPI
       if: steps.deployable.outputs.DEPLOY
       uses: pypa/gh-action-pypi-publish@release/v1
       with:
         user: __token__
         password: ${{ secrets.PYPI_API_TOKEN }}
+    - name: Wait for package to mirror
+      if: steps.deployable.outputs.DEPLOY
+      run: |
+        MAX_ATTEMPTS=60  # Adjust the maximum number of attempts as needed
+        SLEEP_INTERVAL=5  # Adjust the sleep interval (in seconds) as needed
+        for ((attempt = 1; attempt <= MAX_ATTEMPTS; attempt++)); do
+          LATEST_VERSION=$(curl -s "${PYPI_URL}/${PKG_NAME}/" | grep -oP "${PKG_NAME}-\K[0-9]+\.[0-9]+\.[0-9]+(?=\.tar\.gz)" | sort -V | tail -n 1)
+          if [ "$PKG_VERSION" == "$LATEST_VERSION" ]; then
+            echo "Updated package version ${PKG_VERSION} is now available on PyPI. Exiting..."
+            exit 0
+          else
+            echo "Package version ${PKG_VERSION} not yet available on PyPI (latest found = $LATEST_VERSION). Waiting..."
+            sleep $SLEEP_INTERVAL
+          fi
+        done
+        echo "Timeout reached. Exiting..."
+        exit 1
             
-  build-deploy-pipelines:
-    needs: [deploy-python]
+  pipelines:
+    needs: [python]
     runs-on: ubuntu-latest
     steps:
     - name: Remove unnecessary tools to free space
@@ -148,7 +148,7 @@ jobs:
     - name: Get release tag
       run: |
         git fetch --prune --unshallow
-        echo "RELEASE=`echo $(git describe --tags --abbrev=0)`" >> $GITHUB_ENV
+        echo "VERSION=`echo $(git describe --tags --abbrev=0)`" >> $GITHUB_ENV
     - name: Unset header
       # checkout@v2 adds a header that makes branch protection report errors
       # because the Github action bot is not a collaborator on the repo
@@ -167,17 +167,22 @@ jobs:
         username: ${{ github.actor }}
         password: ${{ secrets.GITHUB_TOKEN }} # - must be in GitHub Secrets!
     - name: Check for tagged release
-      id: deployable
-      if: github.event_name == 'push' && startsWith(github.ref, 'refs/tags/v')
-      run: echo "PUSH=--push" >> $GITHUB_ENV
+      if: github.event_name == 'release'
+      run: echo "RELEASE=1" >> $GITHUB_ENV
     - name: Build and push container images
-      run: >
-        arcana deploy make-app specs/australian-imaging-service-community xnat:XnatApp 
-        --registry ghcr.io --check-registry --clean-up --tag-latest --loglevel info 
-        --release pipelines-community-metapackage $RELEASE $PUSH
+      run: |
+        if [ -z "$RELEASE" ]; then
+          OPTIONS=--push
+        else
+          OPTIONS=--use-local-packages
+          pip install -e ./src
+        fi
+        arcana deploy make-app specs/australian-imaging-service-community xnat:XnatApp \
+        --registry ghcr.io --check-registry --clean-up --tag-latest --loglevel info \
+        --release pipelines-community-metapackage $VERSION $OPTIONS
 
   deploy-docs:
-    needs: [build-docs, build-deploy-pipelines]
+    needs: [build-docs, pipelines]
     runs-on: ubuntu-latest
     steps:
     - name: Download built docs
@@ -195,7 +200,7 @@ jobs:
       run: if [ -n "$GHPAGES_DEPLOY_KEY" ]; then echo "DEPLOY=true" >> $GITHUB_OUTPUT; fi
     - name: Deploy docs
       uses: peaceiris/actions-gh-pages@v3
-      if: github.event_name == 'push' && startsWith(github.ref, 'refs/tags/v')
+      if: steps.deployable.outputs.DEPLOY
       with:
         github_token: ${{ secrets.GITHUB_TOKEN }}
         publish_dir: .
@@ -206,7 +211,7 @@ jobs:
     # only when real docs changes occur would require using a PAT.
     - name: Trigger rebuild of docs
       uses: peter-evans/repository-dispatch@v1
-      if: github.event_name == 'push' && startsWith(github.ref, 'refs/tags/v')
+      if: steps.deployable.outputs.DEPLOY
       with:
         token: ${{ secrets.GITHUBPAGES_KEY }}
         repository: Australian-Imaging-Service/Australian-Imaging-Service.github.io
