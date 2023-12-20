@@ -6,6 +6,7 @@ version:
 base_image:
   # Pick a generic base image, in this case Ubuntu - Jammy (22.04LTS)
   name: deepmi/fastsurfer
+  package_manager: apt
   tag: cpu-v2.1.1
 authors:
   # Authors of the pipeline. The first email will be considered to be the maintainer of
