@@ -26,3 +26,4 @@ test.log
 *.venv
 .mypy_cache
 .build*
+_version.py
