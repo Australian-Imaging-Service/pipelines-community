@@ -13,7 +13,6 @@ results = runner.invoke(
         f"{PKG_PATH}/specs/australian-imaging-service-community/au/edu/sydney/sydneyimaging",
         "xnat:XnatApp",
         "--raise-errors",
-        "--clean-up",
         "--push",
         "--loglevel",
         "info",
