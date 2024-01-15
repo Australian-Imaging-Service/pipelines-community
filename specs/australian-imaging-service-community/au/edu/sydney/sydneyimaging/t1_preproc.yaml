@@ -26,7 +26,7 @@ docs:
   description: |  # Description of tool for auto-docs
    Generate a 5TT image (HSVS) and parcellation image (Desikan, Destrieux, HCPMMP1, Yeo7 and Yeo17) from a single input anatomical image. Input image should satisfy the input requirements for FastSurfer
 command:
-  task: australianimagingservice_community.au.edu.sydney.sydneyimaging.t1_preproc:t1_preproc  # Use the generic "shell-cmd" task
+  task: australianimagingservice.community.au.edu.sydney.sydneyimaging.t1_preproc:t1_preproc  # Use the generic "shell-cmd" task
   row_frequency: session  # the pipeline is desgined to run on imaging "sessions" as opposed to "subjects" or "projects"
   inputs:  # List the inputs that are presented to end-user in UI
     T1w:
