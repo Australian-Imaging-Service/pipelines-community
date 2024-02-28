@@ -1,8 +1,6 @@
 
 from pathlib import Path
 import tempfile
-import operator as op
-import functools
 from fileformats.generic import Directory
 from fileformats.application import Zip
 from arcana.common import DirTree
