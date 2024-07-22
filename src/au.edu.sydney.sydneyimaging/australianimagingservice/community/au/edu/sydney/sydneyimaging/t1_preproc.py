@@ -14,11 +14,13 @@ from pydra.tasks.fastsurfer.v2_2 import Fastsurfer
 from pathlib import Path
 import os
 
-
+freesurfer_home = "/Applications/freesurfer/"
 os.environ["SUBJECTS_DIR"] = ""
 
 
-def t1_processing_pipeline(parcellation: str, mrtrix_lut_dir: Path, fs_license: Path) -> Workflow:
+def t1_processing_pipeline(
+    parcellation: str, mrtrix_lut_dir: Path, fs_license: Path
+) -> Workflow:
     # Define the input values using input_spec
     input_spec = {"t1w": File, "parcellation": str}
     # Define the output_spec for the workflow
@@ -112,14 +114,16 @@ def t1_processing_pipeline(parcellation: str, mrtrix_lut_dir: Path, fs_license: 
         # output_path: Path,
     ):
         node_image = parcellation + "_nodes.mif"
-        final_parc_image ="parcellation_image_" + parcellation + ".mif.gz"
+        final_parc_image = "parcellation_image_" + parcellation + ".mif.gz"
         normimg_path = os.path.join(FS_dir, "mri", "norm.mgz")
         parc = parcellation
 
         if parcellation == "desikan":
             # DESIKAN definitions
             fsavg_dir = ""
-            parc_lut_file = os.path.join(os.environ["FREESURFER_HOME"], "FreeSurferColorLUT.txt")
+            parc_lut_file = os.path.join(
+                os.environ["FREESURFER_HOME"], "FreeSurferColorLUT.txt"
+            )
             mrtrix_lut_file = os.path.join(mrtrix_lut_dir, "fs_default.txt")
             output_parcellation_filename = os.path.join(FS_dir, "mri", "aparc+aseg.mgz")
             lh_annotation = ""
