@@ -31,6 +31,7 @@ def t1_processing_pipeline(
     cache_dir: Path,
     fs_license: Path,
     fastsurfer_executable: ty.Union[str, ty.List[str], None] = None,
+    fastsurfer_python: str = "python3",
     name: str = "t1_preprocessing_pipeline",
 ) -> Workflow:
     # Define the input values using input_spec
@@ -62,7 +63,7 @@ def t1_processing_pipeline(
             fs_license=fs_license,
             subject_id="FS_outputs",
             name="FastSurfer_task",
-            py="python3.11",
+            py=fastsurfer_python,
             norm_img="norm.mgz",
             aparcaseg_img="aparcaseg.mgz",
             fsaparc=True,

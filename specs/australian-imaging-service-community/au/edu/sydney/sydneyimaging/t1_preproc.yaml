@@ -165,3 +165,4 @@ command:
     fastsurfer_executable:
       - /fastsurfer/Docker/entrypoint.sh
       - /fastsurfer/run_fastsurfer.sh
+      - --allow_root
