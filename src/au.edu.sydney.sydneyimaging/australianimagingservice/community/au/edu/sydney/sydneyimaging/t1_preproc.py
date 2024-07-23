@@ -30,7 +30,8 @@ def t1_processing_pipeline(
     mrtrix_lut_dir: Path,
     cache_dir: Path,
     fs_license: Path,
-    name: str = "t1_preprocessing_pipeline"
+    fastsurfer_executable: ty.Union[str, ty.List[str], None] = None,
+    name: str = "t1_preprocessing_pipeline",
 ) -> Workflow:
     # Define the input values using input_spec
     input_spec = {
@@ -69,6 +70,8 @@ def t1_processing_pipeline(
             threads=24,
         )
     )
+    if fastsurfer_executable:
+        wf.FastSurfer_task.inputs.executable = fastsurfer_executable
 
     # #################################################
     # # FIVE TISSUE TYPE Generation and visualisation #
