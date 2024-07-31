@@ -999,24 +999,36 @@ def t1_processing_pipeline(
 
         return_image = wf.SGMfix_task.lzout.out_file
 
-    # wf.set_output(
-    #     (
-    #         ("parc_image", return_image),
-    #         ("vis_image_fsl", vis_image_fsl),
-    #         ("ftt_image_fsl", ftt_image_fsl),
-    #         ("vis_image_freesurfer", vis_image_freesurfer),
-    #         ("ftt_image_freesurfer", ftt_image_freesurfer),
-    #         ("vis_image_hsvs", vis_image_hsvs),
-    #         ("ftt_image_hsvs", ftt_image_hsvs),
-    #     )
-    # )
-    wf.set_output(("parc_image", return_image))
-    wf.set_output(("vis_image_fsl", vis_image_fsl))
-    wf.set_output(("ftt_image_fsl", ftt_image_fsl))
-    wf.set_output(("vis_image_freesurfer", vis_image_freesurfer))
-    wf.set_output(("ftt_image_freesurfer", ftt_image_freesurfer))
-    wf.set_output(("vis_image_hsvs", vis_image_hsvs))
-    wf.set_output(("ftt_image_hsvs", ftt_image_hsvs))
+    wf.set_output(
+        (
+            "parc_image",
+            return_image,
+        ),
+        (
+            "vis_image_fsl",
+            vis_image_fsl,
+        ),
+        (
+            "ftt_image_fsl",
+            ftt_image_fsl,
+        ),
+        (
+            "vis_image_freesurfer",
+            vis_image_freesurfer,
+        ),
+        (
+            "ftt_image_freesurfer",
+            ftt_image_freesurfer,
+        ),
+        (
+            "vis_image_hsvs",
+            vis_image_hsvs,
+        ),
+        (
+            "ftt_image_hsvs",
+            ftt_image_hsvs,
+        ),
+    )
 
     return wf
 
