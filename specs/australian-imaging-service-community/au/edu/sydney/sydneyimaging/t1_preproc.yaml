@@ -125,6 +125,31 @@ command:
       field: parc_image
       datatype: medimage-mrtrix3/image-format # MIME-type or "MIME-like" format
       help: parcellation image generated # description of field presented in UI
+    vis_image_fsl:
+      field: vis_image_fsl
+      datatype: medimage-mrtrix3/image-format # MIME-type or "MIME-like" format
+      help: 5ttvis image FSL # description of field presented in UI
+    ftt_image_fsl:
+      field: ftt_image_fsl
+      datatype: medimage-mrtrix3/image-format # MIME-type or "MIME-like" format
+      help: 5tt image FSL # description of field presented in UI
+    vis_image_freesurfer:
+      field: vis_image_freesurfer
+      datatype: medimage-mrtrix3/image-format # MIME-type or "MIME-like" format
+      help: 5ttvis image FreeSurfer # description of field presented in UI
+    ftt_image_freesurfer:
+      field: ftt_image_freesurfer
+      datatype: medimage-mrtrix3/image-format # MIME-type or "MIME-like" format
+      help: 5tt image FreeSurfer # description of field presented in UI
+    vis_image_hsvs:
+      field: vis_image_hsvs
+      datatype: medimage-mrtrix3/image-format # MIME-type or "MIME-like" format
+      help: 5ttvis image HSVS # description of field presented in UI
+    ftt_image_hsvs:
+      field: ftt_image_hsvs
+      datatype: medimage-mrtrix3/image-format # MIME-type or "MIME-like" format
+      help: 5tt image HSVS # description of field presented in UI
+
   #     5TThsvs:
   #       datatype: medimage-mrtrix3/image-format-gz  # MIME-type or "MIME-like" format
   #       help:  5-tissue-type image suitable for ACT generated using HSVS algorithm # description of field presented in UI
