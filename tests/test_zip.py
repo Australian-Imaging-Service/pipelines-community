@@ -1,4 +1,3 @@
-
 from pathlib import Path
 import tempfile
 import operator as op
@@ -8,21 +7,22 @@ from fileformats.application import Zip
 from arcana.common import DirTree
 from arcana.testing import TestDataSpace
 from arcana.testing.data.blueprint import (
-    TestDatasetBlueprint, FileSetEntryBlueprint as FileBP
+    TestDatasetBlueprint,
+    FileSetEntryBlueprint as FileBP,
 )
 from arcana.core.deploy.command import ContainerCommand
 
 
 bp = TestDatasetBlueprint(
-        hierarchy=[
-            "abcd"
-        ],  # e.g. XNAT where session ID is unique in project but final layer is organised by timepoint
-        space=TestDataSpace,
-        dim_lengths=[1, 1, 1, 1],
-        entries=[
-            FileBP(path="dir1", datatype=Directory, filenames=["dir"]),
-        ],
-    )
+    hierarchy=[
+        "abcd"
+    ],  # e.g. XNAT where session ID is unique in project but final layer is organised by timepoint
+    space=TestDataSpace,
+    dim_lengths=[1, 1, 1, 1],
+    entries=[
+        FileBP(path="dir1", datatype=Directory, filenames=["dir"]),
+    ],
+)
 
 work_dir = Path(tempfile.mkdtemp())
 
@@ -30,7 +30,7 @@ dataset_id = work_dir / "saved-dataset"
 saved_dataset = bp.make_dataset(DirTree(), dataset_id, name="")
 
 command_spec = ContainerCommand(
-    task="arcana.common:shell_cmd",
+    task="arcana.common:shell",
     row_frequency=bp.space.default(),
     inputs=[
         {
@@ -40,7 +40,7 @@ command_spec = ContainerCommand(
             "configuration": {
                 "argstr": "",
                 "position": -1,
-            }
+            },
         },
     ],
     outputs=[
@@ -51,7 +51,7 @@ command_spec = ContainerCommand(
             "configuration": {
                 "argstr": "",
                 "position": -2,
-            }
+            },
         }
     ],
     parameters=[
@@ -67,7 +67,7 @@ command_spec = ContainerCommand(
     ],
     configuration={
         "executable": "zip",
-    }
+    },
 )
 # Start generating the arguments for the CLI
 # Add source to loaded dataset

@@ -1,11 +1,11 @@
-
 from pathlib import Path
 import tempfile
 from arcana.common import Clinical
 from fileformats.medimage import NiftiGz
 from arcana.common import DirTree
 from arcana.testing.data.blueprint import (
-    TestDatasetBlueprint, FileSetEntryBlueprint as FileBP
+    TestDatasetBlueprint,
+    FileSetEntryBlueprint as FileBP,
 )
 from arcana.core.deploy.command import ContainerCommand
 from medimages4tests.mri.neuro.t1w import get_image
@@ -19,13 +19,13 @@ source_dir.mkdir()
 NiftiGz(get_image()).copy(source_dir, new_stem="t1w")
 
 bp = TestDatasetBlueprint(
-        hierarchy=["session"],
-        space=Clinical,
-        dim_lengths=[1, 1, 1],
-        entries=[
-            FileBP(path="t1_weighted", datatype=NiftiGz, filenames=["t1w.nii.gz"]),
-        ],
-    )
+    hierarchy=["session"],
+    space=Clinical,
+    dim_lengths=[1, 1, 1],
+    entries=[
+        FileBP(path="t1_weighted", datatype=NiftiGz, filenames=["t1w.nii.gz"]),
+    ],
+)
 
 work_dir = Path(tempfile.mkdtemp())
 
@@ -33,7 +33,7 @@ dataset_id = work_dir / "saved-dataset"
 saved_dataset = bp.make_dataset(DirTree(), dataset_id, name="", source_data=source_dir)
 
 command_spec = ContainerCommand(
-    task="arcana.common:shell_cmd",
+    task="arcana.common:shell",
     row_frequency=Clinical.session,
     inputs=[
         {
@@ -43,7 +43,7 @@ command_spec = ContainerCommand(
             "configuration": {
                 "argstr": "",
                 "position": -2,
-            }
+            },
         },
     ],
     outputs=[
@@ -54,12 +54,12 @@ command_spec = ContainerCommand(
             "configuration": {
                 "argstr": "",
                 "position": -1,
-            }
+            },
         }
     ],
     configuration={
         "executable": "bet",
-    }
+    },
 )
 # Start generating the arguments for the CLI
 # Add source to loaded dataset
