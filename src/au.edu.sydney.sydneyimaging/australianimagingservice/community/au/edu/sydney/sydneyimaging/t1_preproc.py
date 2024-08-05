@@ -1007,27 +1007,27 @@ def t1_processing_pipeline(
             ),
             (
                 "vis_image_fsl",
-                vis_image_fsl,
+                wf.fTTvis_task_fsl.lzout.out_file,
             ),
             (
                 "ftt_image_fsl",
-                ftt_image_fsl,
+                wf.fTTgen_task_fsl.lzout.out_file,
             ),
             (
                 "vis_image_freesurfer",
-                vis_image_freesurfer,
+                wf.fTTvis_task_freesurfer.lzout.out_file,
             ),
             (
                 "ftt_image_freesurfer",
-                ftt_image_freesurfer,
+                wf.fTTgen_task_freesurfer.lzout.out_file,
             ),
             (
                 "vis_image_hsvs",
-                vis_image_hsvs,
+                wf.fTTvis_task_hsvs.lzout.out_file,
             ),
             (
                 "ftt_image_hsvs",
-                ftt_image_hsvs,
+                wf.fTTgen_task_hsvs.lzout.out_file,
             ),
         ]
     )
@@ -1074,3 +1074,11 @@ def t1_processing_pipeline(
 #         fs_license="/Users/arkievdsouza/Desktop/FastSurferTesting/ReferenceFiles/FS_license.txt",
 #         plugin="serial",
 #     )
+
+
+if __name__ == "__main__":
+    import sys
+
+    args = sys.argv[1:]
+
+    t1_processing_pipeline(*args)
