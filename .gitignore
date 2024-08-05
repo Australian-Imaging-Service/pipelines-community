@@ -26,3 +26,4 @@ test.log
 *.venv
 .mypy_cache
 .build*
+.ipynb_checkpoints
