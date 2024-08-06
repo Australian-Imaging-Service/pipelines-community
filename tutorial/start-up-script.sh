@@ -13,7 +13,10 @@ git pull
 # Install the pipelines-community repository
 pip install -r ./tutorial/requirements.txt
 
-# Pre-build the XNAT docker image to save time
+# Pre-build/pull the required XNAT docker images to save time
 xnat4tests -c ./tutorial/xnat4tests-config.yaml start --with-data openneuro-t1w
 xnat4tests -c ./tutorial/xnat4tests-config.yaml stop
+pydra2app make xnat ./specs/australian-imaging-service-community/examples/zip.yaml --spec-root ./specs  --for-localhost
+pydra2app make xnat ./specs/australian-imaging-service-community/examples/bet.yaml --spec-root ./specs  --for-localhost
+docker pull vnmd/freesurfer_7.1.1
 popd

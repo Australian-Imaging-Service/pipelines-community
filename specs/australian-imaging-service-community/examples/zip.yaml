@@ -1,5 +1,5 @@
 # The version of the specification format used for this file
-spec_version: 1.0
+schema_version: 1.0
 # Short name for the pipeline referenced in the UI
 title: "Zips up a file or directory"
 version:
@@ -26,7 +26,7 @@ packages:
     - zip
 command:
   # Use the generic "shell-command" task
-  task: pydra2app.common:shell
+  task: common:shell
   # the pipeline is desgined to run on imaging "sessions" as opposed to "subjects" or "projects"
   row_frequency: session
   # List the inputs that are presented to end-user in UI

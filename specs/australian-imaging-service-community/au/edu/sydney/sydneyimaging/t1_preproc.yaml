@@ -1,5 +1,5 @@
 title: "Preprocess T1-weighted MRI" # Short name for the pipeline referenced in the UI
-spec_version: 1.0 # the version of the specification format used for this file
+schema_version: 1.0 # the version of the specification format used for this file
 version:
   # The version of Ubuntu's zip we are using
   package: "1.0"
