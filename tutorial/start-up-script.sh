@@ -1,9 +1,11 @@
 #!/usr/bin/env bash
 
+ssh-keygen -t rsa -N "" -f $HOME/.ssh/id_rsa.pub
+
 # Clone the pipelines-community repository
 mkdir -p ~/git
 if [ ! -d ~/git/pipelines-community ]; then
-    git clone git@github.com:Australian-Imaging-Service/pipelines-community.git ~/git/pipelines-community
+    git clone https://github.com/Australian-Imaging-Service/pipelines-community.git ~/git/pipelines-community
 fi
 pushd ~/git/pipelines-community
 
