@@ -1,13 +1,13 @@
 from pathlib import Path
 import tempfile
-from arcana.common import Clinical
+from frametree.common import Clinical
 from fileformats.medimage import NiftiGz
-from arcana.common import DirTree
+from frametree.common import DirTree
 from arcana.testing.data.blueprint import (
     TestDatasetBlueprint,
     FileSetEntryBlueprint as FileBP,
 )
-from arcana.core.deploy.command import ContainerCommand
+from pydra2app.core.command import ContainerCommand
 from medimages4tests.mri.neuro.t1w import get_image
 
 
@@ -33,7 +33,7 @@ dataset_id = work_dir / "saved-dataset"
 saved_dataset = bp.make_dataset(DirTree(), dataset_id, name="", source_data=source_dir)
 
 command_spec = ContainerCommand(
-    task="arcana.common:shell",
+    task="common:shell",
     row_frequency=Clinical.session,
     inputs=[
         {

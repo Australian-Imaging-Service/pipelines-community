@@ -4,13 +4,13 @@ import operator as op
 import functools
 from fileformats.generic import Directory
 from fileformats.application import Zip
-from arcana.common import DirTree
-from arcana.testing import TestDataSpace
-from arcana.testing.data.blueprint import (
+from frametree.common import DirTree
+from frametree.testing import TestDataSpace
+from frametree.testing.blueprint import (
     TestDatasetBlueprint,
     FileSetEntryBlueprint as FileBP,
 )
-from arcana.core.deploy.command import ContainerCommand
+from pydra2app.core.command import ContainerCommand
 
 
 bp = TestDatasetBlueprint(
