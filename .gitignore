@@ -22,7 +22,8 @@ test.log
 /docker-tests
 ~*
 /docs/source/_static/images/logo-square.png
-/src/australianimagingservice_community/_version.py
+/src/**/_version.py
 *.venv
 .mypy_cache
 .build*
+.ipynb_checkpoints
