@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 
-ssh-keygen -t rsa -N "" -f $HOME/.ssh/id_rsa.pub
-echo 'export PATH=$HOME/.local/bin:$PATH' >> ~/.bashrc
+#ssh-keygen -t rsa -N "" -f $HOME/.ssh/id_rsa.pub
+#echo 'export PATH=$HOME/.local/bin:$PATH' >> ~/.bashrc
 
 # Clone the pipelines-community repository
 mkdir -p ~/git
