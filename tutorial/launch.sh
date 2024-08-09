@@ -16,5 +16,9 @@ docker run \
   -e NB_UID="$(id -u)" -e NB_GID="$(id -g)" \
   -p 8888:8888 \
   -p 8080:8080 \
-  -e NEURODESKTOP_VERSION=2024-05-25 ghcr.io/ais-pipelines-tutorial:latest
+  -e NEURODESKTOP_VERSION=2024-05-25 ghcr.io/ais-pipelines-tutorial:latest > out.txt
+
+  JUPYTER_PATH=$(grep http://localhost < out.txt | awk '{print $1}')
+
+  open $JUPYTER_PATH
   
