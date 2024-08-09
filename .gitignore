@@ -27,3 +27,4 @@ test.log
 .mypy_cache
 .build*
 .ipynb_checkpoints
+**/sydneyimagingtest/**

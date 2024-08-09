@@ -24,6 +24,11 @@ packages:
   # Install the zip command in the Ubuntu image
   system:
     - zip
+  pip:
+    - frametree
+    - frametree-xnat
+    - pydra2app-xnat
+    - pydra2app
 command:
   # Use the generic "shell-command" task
   task: common:shell
