@@ -28,3 +28,4 @@ test.log
 .build*
 .ipynb_checkpoints
 **/sydneyimagingtest/**
+_version.py
