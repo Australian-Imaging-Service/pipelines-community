@@ -17,6 +17,7 @@ packages:
     pydra-fsl:
     pydra-fastsurfer:
     fileformats-medimage-extras:
+    australianimagingservice-community-au-edu-sydney-sydneyimaging:
   neurodocker:
     mrtrix3: 3.0.2
     fsl: 6.0.5.1
