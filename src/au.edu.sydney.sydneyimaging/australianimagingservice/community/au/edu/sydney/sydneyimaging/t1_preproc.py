@@ -90,8 +90,8 @@ def t1_processing_pipeline(
         parcellation
         == parcellation  # this loop is a placeholder for if/when we decide to iterate through each parcellation image"aparc-a2009s"
     ):  # to avoid repeating this on every iteration of loop, only exectute on one (first) parcellation
-        ftt_image_hsvs = os.path.join(output_path, "5TT_hsvs.mif.gz")
-        vis_image_hsvs = os.path.join(output_path, "5TTvis_hsvs.mif.gz")
+        ftt_image_hsvs = os.path.join("5TT_hsvs.mif.gz")
+        vis_image_hsvs = os.path.join("5TTvis_hsvs.mif.gz")
 
         # Five tissue-type task HSVS
         wf.add(
@@ -117,8 +117,8 @@ def t1_processing_pipeline(
 
         # Five tissue-type task FreeSurfer
 
-        ftt_image_freesurfer = os.path.join(output_path, "5TT_freesurfer.mif.gz")
-        vis_image_freesurfer = os.path.join(output_path, "5TTvis_freesurfer.mif.gz")
+        ftt_image_freesurfer = os.path.join("5TT_freesurfer.mif.gz")
+        vis_image_freesurfer = os.path.join("5TTvis_freesurfer.mif.gz")
 
         wf.add(
             FivettGen_Freesurfer(
@@ -142,8 +142,8 @@ def t1_processing_pipeline(
 
         # Five tissue-type task fsl
 
-        ftt_image_fsl = os.path.join(output_path, "5TT_fsl.mif.gz")
-        vis_image_fsl = os.path.join(output_path, "5TTvis_fsl.mif.gz")
+        ftt_image_fsl = os.path.join("5TT_fsl.mif.gz")
+        vis_image_fsl = os.path.join("5TTvis_fsl.mif.gz")
 
         wf.add(
             FivettGen_Fsl(
@@ -202,7 +202,7 @@ def t1_processing_pipeline(
         output_path: Path,
     ):
         node_image = parcellation + "_nodes.mif"
-        final_parc_image = os.path.join(output_path, f"Atlas_{parcellation}.mif.gz")
+        final_parc_image = os.path.join(f"Atlas_{parcellation}.mif.gz")
         normimg_path = os.path.join(FS_dir, "mri", "norm.mgz")
 
         if (
