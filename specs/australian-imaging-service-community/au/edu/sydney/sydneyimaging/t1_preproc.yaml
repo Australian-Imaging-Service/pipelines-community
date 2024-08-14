@@ -85,3 +85,5 @@ command:
   configuration: # Additional args passed to arcana.common:shell_cmd
     mrtrix_lut_dir: /opt/mrtrix3/latest/share/mrtrix3/labelconvert
     fs_license: /opt/freesurfer/license.txt
+    freesurfer_home: /opt/freesurfer
+    cache_dir: /work/pydra-cache
