@@ -21,6 +21,12 @@ authors:
     email: arkiev.dsouza@sydney.edu.au
   - name: Thomas G. Close
     email: thomas.close@sydney.edu.au
+licenses:
+  freesurfer:
+    destination: /opt/freesurfer/license.txt
+    info_url: https://surfer.nmr.mgh.harvard.edu/registration.html
+    description: >
+      FastSurfer, which is used to perform segmentation and surface recon, requires a FreeSurfer license to run.
 docs:
   info_url: 'https://placeholder.org'  # Link to external documentation for underlying tool
   description: |  # Description of tool for auto-docs
