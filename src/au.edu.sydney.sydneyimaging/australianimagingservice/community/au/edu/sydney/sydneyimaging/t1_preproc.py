@@ -45,7 +45,16 @@ def t1_processing_pipeline(
     output_path = Path(cache_dir) / "tmp-outputs"
     output_path.mkdir(parents=True, exist_ok=True)
     # Define the output_spec for the workflow
-    output_spec = {"parc_image": File}
+    output_spec = {
+        "parc_image": File,
+        "vis_image_fsl": File,
+        "ftt_image_fsl": File,
+        "vis_image_freesurfer": File,
+        "ftt_image_freesurfer": File,
+        "vis_image_hsvs": File,
+        "ftt_image_hsvs": File,
+    }
+
     wf = Workflow(
         name="t1_processing_pipeline",
         input_spec=input_spec,
@@ -78,7 +87,8 @@ def t1_processing_pipeline(
     # # FIVE TISSUE TYPE Generation and visualisation #
     # #################################################
     if (
-        parcellation == "aparc-a2009s"
+        parcellation
+        == parcellation  # this loop is a placeholder for if/when we decide to iterate through each parcellation image"aparc-a2009s"
     ):  # to avoid repeating this on every iteration of loop, only exectute on one (first) parcellation
         ftt_image_hsvs = os.path.join(output_path, "5TT_hsvs.mif.gz")
         vis_image_hsvs = os.path.join(output_path, "5TTvis_hsvs.mif.gz")
@@ -147,7 +157,7 @@ def t1_processing_pipeline(
             )
         )
 
-        # Five tissue-type visualisation task FreeSurfer
+        # Five tissue-type visualisation task FSL
         wf.add(
             Fivett2Vis(
                 in_file=wf.fTTgen_task_fsl.lzout.out_file,
@@ -993,6 +1003,18 @@ def t1_processing_pipeline(
         (
             "parc_image",
             return_image,
+            "vis_image_fsl",
+            vis_image_fsl,
+            "ftt_image_fsl",
+            ftt_image_fsl,
+            "vis_image_freesurfer",
+            vis_image_freesurfer,
+            "ftt_image_freesurfer",
+            ftt_image_freesurfer,
+            "vis_image_hsvs",
+            vis_image_hsvs,
+            "ftt_image_hsvs",
+            ftt_image_hsvs,
         )
     )
 
