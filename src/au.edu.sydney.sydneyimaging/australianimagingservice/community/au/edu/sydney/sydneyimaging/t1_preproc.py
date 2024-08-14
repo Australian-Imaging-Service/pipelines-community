@@ -32,7 +32,7 @@ def t1_processing_pipeline(parcellation: str, mrtrix_lut_dir: Path, fs_license: 
     # ###################
 
     wf.add(
-        fastsurfer(
+        Fastsurfer(
             T1_files=wf.lzin.t1w,
             fs_license=wf.lzin.fs_license,
             subject_id="FS_outputs",
