@@ -13,11 +13,12 @@ base_image:
 packages:
   # Install dependencies for DICOM->NIfTI conversion
   pip:
-    pydra-mrtrix3:
+    pydra-mrtrix3: 3.0.4a5
     pydra-fsl:
+    fileformats:
     pydra-fastsurfer:
     fileformats-medimage-extras:
-    fileformats-medimage-mrtrix3:
+    fileformats-medimage-mrtrix3: 3.0.4a5
     australianimagingservice-community-au-edu-sydney-sydneyimaging:
   neurodocker:
     mrtrix3: 3.0.2

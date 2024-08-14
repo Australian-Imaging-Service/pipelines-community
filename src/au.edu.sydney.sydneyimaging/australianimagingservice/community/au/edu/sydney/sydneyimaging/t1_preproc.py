@@ -18,13 +18,13 @@ import os
 os.environ["SUBJECTS_DIR"] = ""
 
 
-def t1_processing_pipeline(parcellation: str, mrtrix_lut_dir: Path, fs_license: Path) -> Workflow:
+def t1_processing_pipeline(parcellation: str, mrtrix_lut_dir: Path, fs_license: Path, name: str = "t1_preprocessing_pipeline") -> Workflow:
     # Define the input values using input_spec
     input_spec = {"t1w": File, "parcellation": str}
     # Define the output_spec for the workflow
     output_spec = {"parc_image": ImageFormat}
     wf = Workflow(
-        name="t1_processing_pipeline", input_spec=input_spec, output_spec=output_spec
+        name=name, input_spec=input_spec, output_spec=output_spec
     )
 
     # ###################
@@ -34,7 +34,7 @@ def t1_processing_pipeline(parcellation: str, mrtrix_lut_dir: Path, fs_license: 
     wf.add(
         Fastsurfer(
             T1_files=wf.lzin.t1w,
-            fs_license=wf.lzin.fs_license,
+            fs_license=fs_license,
             subject_id="FS_outputs",
             name="FastSurfer_task",
             py="python3.11",
