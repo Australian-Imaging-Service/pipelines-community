@@ -31,7 +31,6 @@ jobs:
           submodules: recursive  # Fetch Hugo themes (true OR recursive)
           fetch-depth: 1    # Fetch all history for .GitInfo and .Lastmod
       # TODO: Need a unique key we can pass, but as we're targeting
-      # arcana@master, this is not trivial.
       #
       # - name: Cache dependencies
       #   uses: actions/cache@v1
@@ -47,7 +46,7 @@ jobs:
       - name: Install python dependencies
         run: pip install -r ./requirements.txt
       - name: Generate pipeline docs
-        run: arcana deploy make-docs specs/australian-imaging-service-community docs/pipelines --flatten --default-data-space arcana.common:Clinical
+        run: pydra2app make-docs specs/australian-imaging-service-community docs/pipelines --flatten --default-data-space common:Clinical
       - uses: actions/upload-artifact@v3
         with:
           name: built-docs
@@ -174,7 +173,7 @@ jobs:
             pip install -e ./src/$pkg
           done
         fi
-        arcana deploy make-app specs/australian-imaging-service-community xnat:XnatApp \
+        pydra2app make xnat specs/australian-imaging-service-community \
         --registry ghcr.io --check-registry --clean-up --tag-latest --loglevel info \
         --release pipelines-community-metapackage $VERSION $OPTIONS
 
