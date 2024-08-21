@@ -2,7 +2,7 @@ from pathlib import Path
 import tempfile
 from frametree.common import Clinical
 from fileformats.medimage import NiftiGz
-from frametree.common import DirTree
+from frametree.common import FileSystem
 from arcana.testing.data.blueprint import (
     TestDatasetBlueprint,
     FileSetEntryBlueprint as FileBP,
@@ -30,7 +30,9 @@ bp = TestDatasetBlueprint(
 work_dir = Path(tempfile.mkdtemp())
 
 dataset_id = work_dir / "saved-dataset"
-saved_dataset = bp.make_dataset(DirTree(), dataset_id, name="", source_data=source_dir)
+saved_dataset = bp.make_dataset(
+    FileSystem(), dataset_id, name="", source_data=source_dir
+)
 
 command_spec = ContainerCommand(
     task="common:shell",

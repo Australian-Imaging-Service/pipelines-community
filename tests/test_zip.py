@@ -4,8 +4,8 @@ import operator as op
 import functools
 from fileformats.generic import Directory
 from fileformats.application import Zip
-from frametree.common import DirTree
-from frametree.testing import TestDataSpace
+from frametree.common import FileSystem
+from frametree.testing import TestAxes
 from frametree.testing.blueprint import (
     TestDatasetBlueprint,
     FileSetEntryBlueprint as FileBP,
@@ -17,7 +17,7 @@ bp = TestDatasetBlueprint(
     hierarchy=[
         "abcd"
     ],  # e.g. XNAT where session ID is unique in project but final layer is organised by timepoint
-    space=TestDataSpace,
+    space=TestAxes,
     dim_lengths=[1, 1, 1, 1],
     entries=[
         FileBP(path="dir1", datatype=Directory, filenames=["dir"]),
@@ -27,7 +27,7 @@ bp = TestDatasetBlueprint(
 work_dir = Path(tempfile.mkdtemp())
 
 dataset_id = work_dir / "saved-dataset"
-saved_dataset = bp.make_dataset(DirTree(), dataset_id, name="")
+saved_dataset = bp.make_dataset(FileSystem(), dataset_id, name="")
 
 command_spec = ContainerCommand(
     task="arcana.common:shell",
