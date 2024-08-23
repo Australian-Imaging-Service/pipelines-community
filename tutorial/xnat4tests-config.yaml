@@ -1,0 +1,4 @@
+build_args:
+  xnat_cs_plugin_version: 3.4.3
+  xnat_version: 1.8.10.1
+xnat_root_dir: /home/ubuntu/xnat4tests-root

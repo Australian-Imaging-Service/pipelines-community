@@ -1,0 +1,5 @@
+pydra2app-xnat >=0.5
+xnat4tests
+jupyter
+bash_kernel
+

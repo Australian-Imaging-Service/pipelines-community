@@ -1,5 +1,5 @@
-arcana_spec_version: 1.0 # the version of the specification format used for this file
-title: "T1-weighted MRI Preprocessing" # Short name for the pipeline referenced in the UI
+title: "Preprocess T1-weighted MRI" # Short name for the pipeline referenced in the UI
+schema_version: 1.0 # the version of the specification format used for this file
 version:
   # Define a version for the pipeline in combination of the underlying package version (e.g. FSL)
   # and the "build" of the pipeline
