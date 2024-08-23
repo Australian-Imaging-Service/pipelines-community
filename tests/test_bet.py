@@ -7,7 +7,7 @@ from arcana.testing.data.blueprint import (
     TestDatasetBlueprint,
     FileSetEntryBlueprint as FileBP,
 )
-from pydra2app.core.command import ContainerCommand
+from pipeline2app.core.command import ContainerCommand
 from medimages4tests.mri.neuro.t1w import get_image
 
 
@@ -20,7 +20,7 @@ NiftiGz(get_image()).copy(source_dir, new_stem="t1w")
 
 bp = TestDatasetBlueprint(
     hierarchy=["session"],
-    space=Clinical,
+    axes=Clinical,
     dim_lengths=[1, 1, 1],
     entries=[
         FileBP(path="t1_weighted", datatype=NiftiGz, filenames=["t1w.nii.gz"]),
@@ -66,7 +66,7 @@ command_spec = ContainerCommand(
 # Start generating the arguments for the CLI
 # Add source to loaded dataset
 command_spec.execute(
-    dataset_locator=saved_dataset.locator,
+    address=saved_dataset.locator,
     input_values=[
         ("t1w", "t1_weighted"),
     ],

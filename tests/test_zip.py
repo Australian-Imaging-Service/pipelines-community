@@ -10,14 +10,14 @@ from frametree.testing.blueprint import (
     TestDatasetBlueprint,
     FileSetEntryBlueprint as FileBP,
 )
-from pydra2app.core.command import ContainerCommand
+from pipeline2app.core.command import ContainerCommand
 
 
 bp = TestDatasetBlueprint(
     hierarchy=[
         "abcd"
-    ],  # e.g. XNAT where session ID is unique in project but final layer is organised by timepoint
-    space=TestAxes,
+    ],  # e.g. XNAT where session ID is unique in project but final layer is organised by visit
+    axes=TestAxes,
     dim_lengths=[1, 1, 1, 1],
     entries=[
         FileBP(path="dir1", datatype=Directory, filenames=["dir"]),
@@ -72,7 +72,7 @@ command_spec = ContainerCommand(
 # Start generating the arguments for the CLI
 # Add source to loaded dataset
 command_spec.execute(
-    dataset_locator=saved_dataset.locator,
+    address=saved_dataset.locator,
     input_values=[
         ("to_zip", "dir1"),
     ],
