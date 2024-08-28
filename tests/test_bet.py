@@ -3,7 +3,7 @@ import tempfile
 from frametree.common import Clinical
 from fileformats.medimage import NiftiGz
 from frametree.common import FileSystem
-from arcana.testing.data.blueprint import (
+from frametree.testing.data.blueprint import (
     TestDatasetBlueprint,
     FileSetEntryBlueprint as FileBP,
 )
