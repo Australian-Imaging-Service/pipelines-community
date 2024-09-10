@@ -1,6 +1,6 @@
 import typing as ty
 from pydra import Workflow, mark, ShellCommandTask
-from pydra.engine.specs import SpecInfo, BaseSpec, ShellSpec, ShellOutSpec, File
+from pydra.engine.specs import SpecInfo, ShellSpec, ShellOutSpec, File
 from pydra.tasks.mrtrix3.v3_0 import (
     LabelConvert,
     LabelSgmfix,
@@ -8,11 +8,9 @@ from pydra.tasks.mrtrix3.v3_0 import (
     FivettGen_Hsvs,
     FivettGen_Freesurfer,
     FivettGen_Fsl,
-    MrConvert,
 )
 from fileformats.generic import Directory
-from fileformats.medimage_mrtrix3 import ImageFormat
-from fileformats.medimage import NiftiGz, Nifti
+from fileformats.medimage import NiftiGz
 from pydra.tasks.fastsurfer.latest import Fastsurfer
 from pathlib import Path
 import os
@@ -90,14 +88,12 @@ def t1_processing_pipeline(
         parcellation
         == parcellation  # this loop is a placeholder for if/when we decide to iterate through each parcellation image"aparc-a2009s"
     ):  # to avoid repeating this on every iteration of loop, only exectute on one (first) parcellation
-        ftt_image_hsvs = os.path.join("5TT_hsvs.mif.gz")
-        vis_image_hsvs = os.path.join("5TTvis_hsvs.mif.gz")
 
         # Five tissue-type task HSVS
         wf.add(
             FivettGen_Hsvs(
                 in_file=wf.FastSurfer_task.lzout.subjects_dir_output,  # wf.lzin.FS_dir,
-                out_file=ftt_image_hsvs,
+                out_file="5TT_hsvs.mif.gz",
                 name="fTTgen_task_hsvs",
                 nocrop=True,
                 sgm_amyg_hipp=True,
@@ -110,20 +106,17 @@ def t1_processing_pipeline(
         wf.add(
             Fivett2Vis(
                 in_file=wf.fTTgen_task_hsvs.lzout.out_file,
-                out_file=vis_image_hsvs,
+                out_file="5TTvis_hsvs.mif.gz",
                 name="fTTvis_task_hsvs",
             )
         )
 
         # Five tissue-type task FreeSurfer
 
-        ftt_image_freesurfer = os.path.join("5TT_freesurfer.mif.gz")
-        vis_image_freesurfer = os.path.join("5TTvis_freesurfer.mif.gz")
-
         wf.add(
             FivettGen_Freesurfer(
                 in_file=wf.FastSurfer_task.lzout.aparcaseg_img,  # wf.lzin.aparcaseg_img,
-                out_file=ftt_image_freesurfer,
+                out_file="5TT_freesurfer.mif.gz",
                 name="fTTgen_task_freesurfer",
                 nocrop=True,
                 sgm_amyg_hipp=True,
@@ -135,20 +128,17 @@ def t1_processing_pipeline(
         wf.add(
             Fivett2Vis(
                 in_file=wf.fTTgen_task_freesurfer.lzout.out_file,
-                out_file=vis_image_freesurfer,
+                out_file="5TTvis_freesurfer.mif.gz",
                 name="fTTvis_task_freesurfer",
             )
         )
 
         # Five tissue-type task fsl
 
-        ftt_image_fsl = os.path.join("5TT_fsl.mif.gz")
-        vis_image_fsl = os.path.join("5TTvis_fsl.mif.gz")
-
         wf.add(
             FivettGen_Fsl(
                 in_file=wf.FastSurfer_task.lzout.norm_img,  # wf.lzin.t1w,
-                out_file=ftt_image_fsl,
+                out_file="5TT_fsl.mif.gz",
                 name="fTTgen_task_fsl",
                 nocrop=True,
                 sgm_amyg_hipp=True,
@@ -161,7 +151,7 @@ def t1_processing_pipeline(
         wf.add(
             Fivett2Vis(
                 in_file=wf.fTTgen_task_fsl.lzout.out_file,
-                out_file=vis_image_fsl,
+                out_file="5TTvis_fsl.mif.gz",
                 name="fTTvis_task_fsl",
             )
         )
