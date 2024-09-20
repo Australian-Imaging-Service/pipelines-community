@@ -10,7 +10,8 @@ from pydra.tasks.mrtrix3.v3_0 import (
     FivettGen_Fsl,
 )
 from fileformats.generic import Directory
-from fileformats.medimage import NiftiGz
+from fileformats.medimage_mrtrix3 import ImageFormat, ImageFormatGz
+from fileformats.medimage import NiftiGz, Nifti
 from pydra.tasks.fastsurfer.latest import Fastsurfer
 from pathlib import Path
 import os
@@ -40,17 +41,17 @@ def t1_processing_pipeline(
         # "parcellation": str,
         "FS_dir": str,
     }
-    output_path = Path(cache_dir) / "tmp-outputs"
-    output_path.mkdir(parents=True, exist_ok=True)
+    # output_path = Path(cache_dir) / "tmp-outputs"
+    # output_path.mkdir(parents=True, exist_ok=True)
     # Define the output_spec for the workflow
     output_spec = {
-        "parc_image": File,
-        "vis_image_fsl": File,
-        "ftt_image_fsl": File,
-        "vis_image_freesurfer": File,
-        "ftt_image_freesurfer": File,
-        "vis_image_hsvs": File,
-        "ftt_image_hsvs": File,
+        "parc_image": ImageFormatGz,
+        "vis_image_fsl": ImageFormatGz,
+        "ftt_image_fsl": ImageFormatGz,
+        "vis_image_freesurfer": ImageFormatGz,
+        "ftt_image_freesurfer": ImageFormatGz,
+        "vis_image_hsvs": ImageFormatGz,
+        "ftt_image_hsvs": ImageFormatGz,
     }
 
     wf = Workflow(
@@ -189,7 +190,7 @@ def t1_processing_pipeline(
         FS_dir: str,
         freesurfer_home: str,
         mrtrix_lut_dir: Path,
-        output_path: Path,
+        # output_path: Path,
     ):
         node_image = parcellation + "_nodes.mif"
         final_parc_image = os.path.join(f"Atlas_{parcellation}.mif.gz")
@@ -440,7 +441,7 @@ def t1_processing_pipeline(
             parcellation=parcellation,
             freesurfer_home=freesurfer_home,
             mrtrix_lut_dir=mrtrix_lut_dir,
-            output_path=output_path,
+            # output_path=output_path,
             name="join_task",
         )
     )
@@ -1028,31 +1029,98 @@ def t1_processing_pipeline(
 # # ########################
 # # # Execute the workflow #
 # # ########################
-# parcellation_list = [
-#     "aparc-a2009s",
-#     "aparc",
-#     "desikan",
-#     "destrieux",
-#     "economo",
-#     "glasser-360",
-#     "hcpmmp1",
-#     "schaefer-100",
-#     "schaefer-1000",
-#     "schaefer-200",
-#     "schaefer-300",
-#     "schaefer-400",
-#     "schaefer-500",
-#     "schaefer-600",
-#     "schaefer-700",
-#     "schaefer-800",
-#     "schaefer-900",
-#     "vosdewael-100",
-#     "vosdewael-200",
-#     "vosdewael-300",
-#     "vosdewael-400",
-#     "Yeo17",
-#     "Yeo7",
-# ]  # List of different parcellations
+parcellation_list = [
+    "aparc-a2009s",
+    "aparc",
+    "desikan",
+    "destrieux",
+    "economo",
+    "glasser-360",
+    "hcpmmp1",
+    "schaefer-100",
+    "schaefer-1000",
+    "schaefer-200",
+    "schaefer-300",
+    "schaefer-400",
+    "schaefer-500",
+    "schaefer-600",
+    "schaefer-700",
+    "schaefer-800",
+    "schaefer-900",
+    "vosdewael-100",
+    "vosdewael-200",
+    "vosdewael-300",
+    "vosdewael-400",
+    "Yeo17",
+    "Yeo7",
+]  # List of different parcellations
+
+
+def t1_preprocessing_pipeline_all(
+    freesurfer_home: Path,
+    mrtrix_lut_dir: Path,
+    cache_dir: Path,
+    fs_license: Path,
+    fastsurfer_executable: ty.Union[str, ty.List[str], None] = None,
+    fastsurfer_python: str = "python3",
+    name: str = "t1_preprocessing_pipeline_all",
+):
+
+    # Define the input values using input_spec
+    input_spec = {
+        "t1w": File,
+        "aparcaseg_img": File,
+        # "fs_license": File,
+        # "parcellation": str,
+        "FS_dir": str,
+    }
+
+    # Define the output_spec for the workflow
+    output_spec = {p: ImageFormatGz for p in parcellation_list}
+    output_spec.update(
+        {
+            "vis_image_fsl": ImageFormatGz,
+            "ftt_image_fsl": ImageFormatGz,
+            "vis_image_freesurfer": ImageFormatGz,
+            "ftt_image_freesurfer": ImageFormatGz,
+            "vis_image_hsvs": ImageFormatGz,
+            "ftt_image_hsvs": ImageFormatGz,
+        }
+    )
+
+    wf = Workflow(
+        name="t1_processing_pipeline",
+        input_spec=input_spec,
+        cache_dir=cache_dir,
+        output_spec=output_spec,
+    )
+
+    for parcellation in parcellation_list:
+
+        wf.add(
+            t1_processing_pipeline(
+                parcellation=parcellation,
+                freesurfer_home=freesurfer_home,
+                mrtrix_lut_dir=mrtrix_lut_dir,
+                cache_dir=cache_dir,
+                fs_license=fs_license,
+                fastsurfer_executable=fastsurfer_executable,
+                fastsurfer_python=fastsurfer_python,
+                name=parcellation,
+            )
+        )
+
+        wf.set_output((parcellation, getattr(wf, parcellation).lzout.parc_image))
+
+    wf.set_output(("vis_image_fsl", wf.desikan.lzout.vis_image_fsl))
+    wf.set_output(("ftt_image_fsl", wf.desikan.lzout.ftt_image_fsl))
+    wf.set_output(("vis_image_freesurfer", wf.desikan.lzout.vis_image_freesurfer))
+    wf.set_output(("ftt_image_freesurfer", wf.desikan.lzout.ftt_image_freesurfer))
+    wf.set_output(("vis_image_hsvs", wf.desikan.lzout.vis_image_hsvs))
+    wf.set_output(("ftt_image_hsvs", wf.desikan.lzout.ftt_image_hsvs))
+
+    return wf
+
 
 # for parcellation in parcellation_list:
 #     wf = t1_processing_pipeline(parcellation=parcellation)
