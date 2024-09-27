@@ -1076,7 +1076,7 @@ def t1_preprocessing_pipeline_all(
     }
 
     # Define the output_spec for the workflow
-    output_spec = {p: ImageFormatGz for p in parcellation_list}
+    output_spec = {p.replace("-", "_"): ImageFormatGz for p in parcellation_list}
     output_spec.update(
         {
             "vis_image_fsl": ImageFormatGz,
@@ -1097,6 +1097,8 @@ def t1_preprocessing_pipeline_all(
 
     for parcellation in parcellation_list:
 
+        parcellation = parcellation.replace("-", "_")
+
         wf.add(
             t1_processing_pipeline(
                 parcellation=parcellation,
@@ -1110,7 +1112,7 @@ def t1_preprocessing_pipeline_all(
             )
         )
 
-        wf.set_output((parcellation, getattr(wf, parcellation).lzout.parc_image))
+        wf.set_output([(parcellation, getattr(wf, parcellation).lzout.parc_image)])
 
     wf.set_output(("vis_image_fsl", wf.desikan.lzout.vis_image_fsl))
     wf.set_output(("ftt_image_fsl", wf.desikan.lzout.ftt_image_fsl))
@@ -1139,4 +1141,5 @@ if __name__ == "__main__":
 
     args = sys.argv[1:]
 
-    t1_processing_pipeline(*args)
+    wf = t1_preprocessing_pipeline_all(*args)
+    wf()
