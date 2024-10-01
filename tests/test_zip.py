@@ -30,7 +30,7 @@ dataset_id = work_dir / "saved-dataset"
 saved_dataset = bp.make_dataset(DirTree(), dataset_id, name="")
 
 command_spec = ContainerCommand(
-    task="arcana.common:shell",
+    task="frametree.common:shell",
     row_frequency=bp.space.default(),
     inputs=[
         {

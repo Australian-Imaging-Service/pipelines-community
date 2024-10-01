@@ -3,11 +3,11 @@ import tempfile
 from frametree.common import Clinical
 from fileformats.medimage import NiftiGz
 from frametree.common import DirTree
-from arcana.testing.data.blueprint import (
+from frametree.testing.blueprint import (
     TestDatasetBlueprint,
     FileSetEntryBlueprint as FileBP,
 )
-from pydra2app.core.command import ContainerCommand
+from pipeline2app.core import ContainerCommand
 from medimages4tests.mri.neuro.t1w import get_image
 
 
