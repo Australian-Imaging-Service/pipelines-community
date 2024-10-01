@@ -1,4 +1,5 @@
 import typing as ty
+import attrs
 from pydra import Workflow, mark, ShellCommandTask
 from pydra.engine.specs import SpecInfo, ShellSpec, ShellOutSpec, File
 from pydra.tasks.mrtrix3.v3_0 import (
@@ -32,33 +33,35 @@ def t1_processing_pipeline(
     fastsurfer_executable: ty.Union[str, ty.List[str], None] = None,
     fastsurfer_python: str = "python3",
     name: str = "t1_preprocessing_pipeline",
+    t1w: File = attrs.NOTHING,
 ) -> Workflow:
     # Define the input values using input_spec
     input_spec = {
         "t1w": File,
-        "aparcaseg_img": File,
+        # "aparcaseg_img": File,
         # "fs_license": File,
         # "parcellation": str,
-        "FS_dir": str,
+        # "FS_dir": str,
     }
     # output_path = Path(cache_dir) / "tmp-outputs"
     # output_path.mkdir(parents=True, exist_ok=True)
     # Define the output_spec for the workflow
-    output_spec = {
-        "parc_image": ImageFormatGz,
-        "vis_image_fsl": ImageFormatGz,
-        "ftt_image_fsl": ImageFormatGz,
-        "vis_image_freesurfer": ImageFormatGz,
-        "ftt_image_freesurfer": ImageFormatGz,
-        "vis_image_hsvs": ImageFormatGz,
-        "ftt_image_hsvs": ImageFormatGz,
-    }
+    # output_spec = {
+    #     "parc_image": ImageFormatGz,
+    #     "vis_image_fsl": ImageFormatGz,
+    #     "ftt_image_fsl": ImageFormatGz,
+    #     "vis_image_freesurfer": ImageFormatGz,
+    #     "ftt_image_freesurfer": ImageFormatGz,
+    #     "vis_image_hsvs": ImageFormatGz,
+    #     "ftt_image_hsvs": ImageFormatGz,
+    # }
 
     wf = Workflow(
         name=name,
         input_spec=input_spec,
         cache_dir=cache_dir,
-        output_spec=output_spec,
+        t1w=t1w,
+        # output_spec=output_spec,
     )
 
     # ###################
@@ -201,7 +204,7 @@ def t1_processing_pipeline(
             or "aparc" in parcellation
             or "vosdewael" in parcellation
             or parcellation == "economo"
-            or parcellation == "glasser-360"
+            or parcellation == "glasser360"
         ):
             fsavg_dir = os.path.join(freesurfer_home, "subjects", "fsaverage5")
             parc_lut_file = os.path.join(
@@ -775,7 +778,7 @@ def t1_processing_pipeline(
         or "aparc" in parcellation
         or "vosdewael" in parcellation
         or parcellation == "economo"
-        or parcellation == "glasser-360"
+        or parcellation == "glasser360"
     ):
 
         ##################################
@@ -894,6 +897,9 @@ def t1_processing_pipeline(
 
         return_image = wf.LabelConvert_task.lzout.image_out
 
+    # else:
+    #     return_image = wf.SGMfix_task.lzout.out_file
+
     ##########################################################
     # # additional mapping for 'hcpmmp1', 'yeo17', 'yeo7 #
     ##########################################################
@@ -989,6 +995,8 @@ def t1_processing_pipeline(
         )
 
         return_image = wf.SGMfix_task.lzout.out_file
+    # else:
+    #     return_image = wf.LabelConvert_task.lzout.image_out
 
     wf.set_output(
         [
@@ -1020,6 +1028,10 @@ def t1_processing_pipeline(
                 "ftt_image_hsvs",
                 wf.fTTgen_task_hsvs.lzout.out_file,
             ),
+            # (
+            #     "FS_outputs",
+            #     wf.FastSurfer_task.lzout.subjects_dir_output,
+            # ),
         ]
     )
 
@@ -1030,27 +1042,27 @@ def t1_processing_pipeline(
 # # # Execute the workflow #
 # # ########################
 parcellation_list = [
-    "aparc-a2009s",
+    "aparca2009s",
     "aparc",
     "desikan",
     "destrieux",
     "economo",
-    "glasser-360",
+    "glasser360",
     "hcpmmp1",
-    "schaefer-100",
-    "schaefer-1000",
-    "schaefer-200",
-    "schaefer-300",
-    "schaefer-400",
-    "schaefer-500",
-    "schaefer-600",
-    "schaefer-700",
-    "schaefer-800",
-    "schaefer-900",
-    "vosdewael-100",
-    "vosdewael-200",
-    "vosdewael-300",
-    "vosdewael-400",
+    "schaefer100",
+    "schaefer1000",
+    "schaefer200",
+    "schaefer300",
+    "schaefer400",
+    "schaefer500",
+    "schaefer600",
+    "schaefer700",
+    "schaefer800",
+    "schaefer900",
+    "vosdewael100",
+    "vosdewael200",
+    "vosdewael300",
+    "vosdewael400",
     "Yeo17",
     "Yeo7",
 ]  # List of different parcellations
@@ -1069,38 +1081,39 @@ def t1_preprocessing_pipeline_all(
     # Define the input values using input_spec
     input_spec = {
         "t1w": File,
-        "aparcaseg_img": File,
+        # "aparcaseg_img": File,
         # "fs_license": File,
         # "parcellation": str,
         "FS_dir": str,
     }
 
     # Define the output_spec for the workflow
-    output_spec = {p.replace("-", "_"): ImageFormatGz for p in parcellation_list}
-    output_spec.update(
-        {
-            "vis_image_fsl": ImageFormatGz,
-            "ftt_image_fsl": ImageFormatGz,
-            "vis_image_freesurfer": ImageFormatGz,
-            "ftt_image_freesurfer": ImageFormatGz,
-            "vis_image_hsvs": ImageFormatGz,
-            "ftt_image_hsvs": ImageFormatGz,
-        }
-    )
+    # output_spec = {p.replace("-", "_"): ImageFormatGz for p in parcellation_list}
+    # output_spec.update(
+    #     {
+    #         "vis_image_fsl": ImageFormatGz,
+    #         "ftt_image_fsl": ImageFormatGz,
+    #         "vis_image_freesurfer": ImageFormatGz,
+    #         "ftt_image_freesurfer": ImageFormatGz,
+    #         "vis_image_hsvs": ImageFormatGz,
+    #         "ftt_image_hsvs": ImageFormatGz,
+    #     }
+    # )
 
     wf = Workflow(
         name="t1_processing_pipeline",
         input_spec=input_spec,
         cache_dir=cache_dir,
-        output_spec=output_spec,
+        # output_spec=output_spec,
     )
 
     for parcellation in parcellation_list:
 
-        parcellation = parcellation.replace("-", "_")
+        # parcellation = parcellation.replace("-", "_")
 
         wf.add(
             t1_processing_pipeline(
+                t1w=wf.lzin.t1w,
                 parcellation=parcellation,
                 freesurfer_home=freesurfer_home,
                 mrtrix_lut_dir=mrtrix_lut_dir,
@@ -1120,6 +1133,7 @@ def t1_preprocessing_pipeline_all(
     wf.set_output(("ftt_image_freesurfer", wf.desikan.lzout.ftt_image_freesurfer))
     wf.set_output(("vis_image_hsvs", wf.desikan.lzout.vis_image_hsvs))
     wf.set_output(("ftt_image_hsvs", wf.desikan.lzout.ftt_image_hsvs))
+    # wf.set_output(("FS_outputs", wf.desikan.lzout.subjects_dir_output))
 
     return wf
 
@@ -1139,7 +1153,7 @@ def t1_preprocessing_pipeline_all(
 if __name__ == "__main__":
     import sys
 
-    args = sys.argv[1:]
+    args = sys.argv[2:]
 
     wf = t1_preprocessing_pipeline_all(*args)
-    wf()
+    wf(t1w=sys.argv[1])
