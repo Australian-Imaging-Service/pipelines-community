@@ -29,6 +29,7 @@ def test_zip():
     saved_dataset = bp.make_dataset(FileSystem(), dataset_id, name="")
 
     command_spec = ContainerCommand(
+        name="bet",
         task="frametree.common:shell",
         row_frequency=bp.space.default(),
         inputs=[

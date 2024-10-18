@@ -37,6 +37,7 @@ def test_bet():
     )
 
     command_spec = ContainerCommand(
+        name="zip",
         task="common:shell",
         row_frequency=Clinical.session,
         inputs=[
