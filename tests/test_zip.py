@@ -72,7 +72,7 @@ command_spec = ContainerCommand(
 # Start generating the arguments for the CLI
 # Add source to loaded dataset
 command_spec.execute(
-    dataset_locator=saved_dataset.locator,
+    address=saved_dataset.address,
     input_values=[
         ("to_zip", "dir1"),
     ],

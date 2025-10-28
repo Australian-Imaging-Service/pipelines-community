@@ -1,0 +1,32 @@
+authors:
+- email: your.email@goes.here
+  name: Your name goes here
+base_image:
+  name: freesurfer/synthstrip
+  package_manager: apt
+  python: python3
+  tag: '1.6'
+commands:
+  your-command:
+    configuration: {}
+    parameters: []
+    row_frequency: common:Clinical[session]
+    task: placeholder
+docs:
+  description: SynthStrip is a skull-stripping tool that extracts brain voxels from
+    a landscape of image types, ranging across imaging modalities, resolutions, and
+    subject populations. It leverages a deep learning strategy to synthesize arbitrary
+    training images from segmentation maps, yielding a robust model agnostic to acquisition
+    specifics.
+  info_url: https://surfer.nmr.mgh.harvard.edu/docs/synthstrip/
+licenses: {}
+packages:
+  conda: {}
+  neurodocker: {}
+  pip: {}
+  system:
+    python3-pip: null
+registry: docker.io
+schema_version: '2.0'
+title: MRI Synthstrip
+version: '1.6'

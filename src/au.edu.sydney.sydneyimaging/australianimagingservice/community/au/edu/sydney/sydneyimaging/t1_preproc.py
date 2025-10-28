@@ -1,13 +1,15 @@
 from pydra import Workflow
 from pydra.engine.specs import File
-# from pydra.tasks.mrtrix3.v3_0 import (
+
+# from pydra.tasks.mrtrix3.v3_1 import (
 #     fivett2vis,
 #     fivettgen_hsvs,
 #     labelconvert,
 #     labelsgmfix,
 # )
 from fileformats.medimage import NiftiGz, MghGz
-# from fileformats.medimage_mrtrix3 import ImageFormat as MIF
+
+# from fileformats.vendor.mrtrix3.medimage import ImageFormat as MIF
 # from pydra.tasks.fastsurfer.latest import fastsurfer
 
 
