@@ -30,7 +30,7 @@ packages:
 commands:
   zip:
   # Use the generic "shell-command" task
-    row_frequency: common:Clinical[session]
+    operates_on: medimage/session
     task: 
       type: shell
       executable: zip

@@ -25,7 +25,7 @@ packages:
     mrtrix3: 3.0.2
 command:
   task: australianimagingservice.community.au.edu.sydney.sydneyimaging.t1_preproc:t1_preproc # Use the generic "shell-cmd" task
-  row_frequency: session # the pipeline is desgined to run on imaging "sessions" as opposed to "subjects" or "projects"
+  operates_on: medimage/session # the pipeline is desgined to run on imaging "sessions" as opposed to "subjects" or "projects"
   inputs: # List the inputs that are presented to end-user in UI
     example_input:
       datatype: medimage/dicom-series # MIME-type or "MIME-like" format
