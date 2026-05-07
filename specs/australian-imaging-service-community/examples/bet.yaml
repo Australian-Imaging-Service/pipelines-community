@@ -23,7 +23,7 @@ docs:
     An example wrapping BET in a XNAT pipeline
 commands:
   bet:
-    row_frequency: common:Clinical[session] # the pipeline is desgined to run on imaging "sessions" as opposed to "subjects" or "projects"
+    operates_on: medimage/session # the pipeline is desgined to run on imaging "sessions" as opposed to "subjects" or "projects"
     task:
       type: shell
       executable: bet

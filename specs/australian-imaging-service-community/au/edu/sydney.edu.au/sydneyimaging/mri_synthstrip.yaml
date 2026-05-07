@@ -1,6 +1,6 @@
 authors:
-- email: your.email@goes.here
-  name: Your name goes here
+- email: ''
+  name: ''
 base_image:
   name: freesurfer/synthstrip
   package_manager: apt
@@ -9,8 +9,9 @@ base_image:
 commands:
   your-command:
     configuration: {}
-    parameters: []
     operates_on: medimage/session
+    sinks: []
+    sources: []
     task: placeholder
 docs:
   description: SynthStrip is a skull-stripping tool that extracts brain voxels from
